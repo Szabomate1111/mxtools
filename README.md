@@ -9,9 +9,9 @@
 |_|  |_/_/\_\__\___/ \___/|_|___/
 ```
 
-**Everything in one place** — interaktív terminál CLI tool.
+**Everything in one place** — interactive terminal CLI tool.
 
-## Telepítés
+## Install
 
 **Linux / macOS:**
 ```bash
@@ -23,22 +23,22 @@ curl -fsSL https://raw.githubusercontent.com/Szabomate1111/mxtools/main/install.
 irm https://raw.githubusercontent.com/Szabomate1111/mxtools/main/install.ps1 | iex
 ```
 
-A függőségek (`rich`, `requests`, `beautifulsoup4`, `yt-dlp`) automatikusan települnek az első indításkor.
+Dependencies (`rich`, `requests`, `beautifulsoup4`, `yt-dlp`) are installed automatically on first run.
 
-## Használat
+## Usage
 
 ```bash
 mxtools
 ```
 
-## Funkciók
+## Features
 
-| # | Funkció | Leírás |
-|---|---------|--------|
-| 1 | Képek letöltése weboldalról | Az összes kép letöltése egy URL-ről ZIP-be |
-| 2 | YouTube letöltő | Videó vagy hang letöltése (mp4 / mp3) |
+| # | Feature | Description |
+|---|---------|-------------|
+| 1 | Image downloader | Scrape all images from a URL and save as ZIP |
+| 2 | YouTube downloader | Download video or audio (mp4 / mp3) |
 
-## Követelmények
+## Requirements
 
 - Python 3.8+
 - Linux / macOS / Windows
