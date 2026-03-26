@@ -3,13 +3,11 @@ import shutil
 
 import yt_dlp
 from rich.console import Console
-from rich.table import Table
-from rich import box
 from rich.prompt import Prompt
 from rich.rule import Rule
-from rich.padding import Padding
 
 from mxtools.core.utils import clear
+from mxtools.core.menu import select
 
 LABEL = "YouTube downloader"
 DESC  = "Download video or audio using yt-dlp"
@@ -44,17 +42,12 @@ def run():
 
     url = Prompt.ask("  [bold cyan]YouTube URL[/bold cyan]", console=console)
 
-    fmt_tbl = Table(box=box.SIMPLE, show_header=False, padding=(0, 2), border_style="dim")
-    fmt_tbl.add_column("", style="bold yellow", width=3)
-    fmt_tbl.add_column("", style="white")
-    for key, (label, _) in formats.items():
-        fmt_tbl.add_row(key, label)
-    console.print()
-    console.print(Padding(fmt_tbl, (0, 2)))
-    console.print()
+    options = [(k, label) for k, (label, _) in formats.items()]
+    choice  = select("Select format", options)
+    if choice is None:
+        return
 
-    choice  = Prompt.ask("  [bold cyan]Format[/bold cyan]", choices=list(formats), default="1", console=console)
-    out_dir = Prompt.ask("  [bold cyan]Save to[/bold cyan]", default=os.path.expanduser("~/Downloads"), console=console)
+    out_dir = Prompt.ask("\n  [bold cyan]Save to[/bold cyan]", default=os.path.expanduser("~/Downloads"), console=console)
     os.makedirs(out_dir, exist_ok=True)
 
     ydl_opts = {

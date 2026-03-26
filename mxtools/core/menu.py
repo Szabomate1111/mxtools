@@ -3,14 +3,18 @@ import curses
 from mxtools.core.utils import BANNER_LINES, SUBTITLE, VERSION
 
 
-def _draw(stdscr, modules, selected):
-    curses.curs_set(0)
+def _init_colors():
     curses.start_color()
     curses.use_default_colors()
     curses.init_pair(1, curses.COLOR_CYAN,  -1)
     curses.init_pair(2, curses.COLOR_WHITE, -1)
     curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_CYAN)
     curses.init_pair(4, 8, -1)
+
+
+def _draw(stdscr, modules, selected):
+    curses.curs_set(0)
+    _init_colors()
 
     CYAN  = curses.color_pair(1) | curses.A_BOLD
     WHITE = curses.color_pair(2)
@@ -110,6 +114,85 @@ def show(modules):
             if   key in (curses.KEY_UP,   ord('k')): selected[0] = (selected[0] - 1) % n
             elif key in (curses.KEY_DOWN, ord('j')): selected[0] = (selected[0] + 1) % n
             elif key in (curses.KEY_ENTER, 10, 13, ord(' ')): return items[selected[0]]
+            elif key in (ord('q'), ord('Q'), 27):    return None
+
+    return curses.wrapper(_loop)
+
+
+def select(title, options):
+    """Arrow-key selection menu. options = list of (key, label) tuples.
+    Returns the selected key, or None if cancelled."""
+    selected = [0]
+    n = len(options)
+
+    def _draw_select(stdscr):
+        curses.curs_set(0)
+        _init_colors()
+
+        CYAN  = curses.color_pair(1) | curses.A_BOLD
+        WHITE = curses.color_pair(2)
+        DIM   = curses.color_pair(4)
+
+        stdscr.erase()
+        h, w = stdscr.getmaxyx()
+
+        box_w   = 50
+        box_x   = max(0, (w - box_w) // 2)
+        inner_w = box_w - 4
+        row     = max(1, h // 2 - (n + 4) // 2)
+
+        def hline(r):
+            if r >= h: return
+            try:
+                stdscr.addstr(r, box_x,          "+", CYAN)
+                stdscr.addstr(r, box_x + 1,       "-" * (box_w - 2), CYAN)
+                stdscr.addstr(r, box_x + box_w-1, "+", CYAN)
+            except curses.error: pass
+
+        hline(row); row += 1
+
+        if row < h:
+            hdr = f" {title}"
+            try:
+                stdscr.addstr(row, box_x,          "|",  CYAN)
+                stdscr.addstr(row, box_x+1,         " ",  WHITE)
+                stdscr.addstr(row, box_x+2,          hdr.ljust(inner_w), curses.color_pair(1)|curses.A_BOLD)
+                stdscr.addstr(row, box_x+2+inner_w, " |", CYAN)
+            except curses.error: pass
+        row += 1
+
+        hline(row); row += 1
+
+        for i, (_, label) in enumerate(options):
+            if row >= h: break
+            is_sel = (i == selected[0])
+            arrow  = " → " if is_sel else "   "
+            text   = (arrow + label).ljust(inner_w)
+            style  = (curses.color_pair(1) | curses.A_BOLD) if is_sel else WHITE
+            try:
+                stdscr.addstr(row, box_x,          "| ",  CYAN)
+                stdscr.addstr(row, box_x+2,         text,  style)
+                stdscr.addstr(row, box_x+2+inner_w, " |",  CYAN)
+            except curses.error: pass
+            row += 1
+
+        hline(row); row += 2
+
+        hint = "↑/↓  navigate    Enter  confirm    q  cancel"
+        if row < h:
+            x = max(0, (w - len(hint)) // 2)
+            try: stdscr.addstr(row, x, hint, DIM)
+            except curses.error: pass
+
+        stdscr.refresh()
+
+    def _loop(stdscr):
+        while True:
+            _draw_select(stdscr)
+            key = stdscr.getch()
+            if   key in (curses.KEY_UP,   ord('k')): selected[0] = (selected[0] - 1) % n
+            elif key in (curses.KEY_DOWN, ord('j')): selected[0] = (selected[0] + 1) % n
+            elif key in (curses.KEY_ENTER, 10, 13, ord(' ')): return options[selected[0]][0]
             elif key in (ord('q'), ord('Q'), 27):    return None
 
     return curses.wrapper(_loop)
