@@ -82,6 +82,17 @@ cp -r "$EXTRACTED/." "$INSTALL_DIR/"
 rm -rf "$TMP_ZIP" "$TMP_DIR"
 _ok "Installed to: $INSTALL_DIR"
 
+_step "Installing Python dependencies..."
+"$PY" -m pip install --break-system-packages -q requests beautifulsoup4 rich yt-dlp
+_ok "Python dependencies installed"
+
+_step "Installing ffmpeg..."
+if ! command -v ffmpeg &>/dev/null; then
+    _install_pkg ffmpeg && _ok "ffmpeg installed" || _warn "ffmpeg install failed. Download manually: https://ffmpeg.org/download.html"
+else
+    _ok "ffmpeg already installed"
+fi
+
 mkdir -p "$BIN_DIR"
 cat > "$BIN_DIR/$BIN_NAME" <<EOF
 #!/usr/bin/env bash

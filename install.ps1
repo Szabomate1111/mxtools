@@ -55,6 +55,18 @@ New-Item -ItemType Directory -Force -Path $BIN_DIR | Out-Null
 Copy-Item -Path "$extracted\*" -Destination $INSTALL_DIR -Recurse -Force
 Write-Ok "Files copied to: $INSTALL_DIR"
 
+Write-Step "Installing Python dependencies..."
+& $PY -m pip install -q requests beautifulsoup4 rich yt-dlp windows-curses
+Write-Ok "Python dependencies installed"
+
+Write-Step "Installing ffmpeg..."
+try {
+    $null = winget install --id Gyan.FFmpeg -e --silent 2>&1
+    Write-Ok "ffmpeg installed"
+} catch {
+    Write-Warn "Could not install ffmpeg automatically. Download from: https://ffmpeg.org/download.html"
+}
+
 $bat = "@echo off`r`nset PYTHONPATH=$INSTALL_DIR`r`n$PY -m mxtools %*"
 Set-Content -Path "$BIN_DIR\mxtools.bat" -Value $bat -Encoding ASCII
 Write-Ok "Launcher: $BIN_DIR\mxtools.bat"
