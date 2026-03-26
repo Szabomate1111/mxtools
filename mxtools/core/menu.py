@@ -8,8 +8,8 @@ def _init_colors():
     curses.use_default_colors()
     curses.init_pair(1, curses.COLOR_CYAN,  -1)
     curses.init_pair(2, curses.COLOR_WHITE, -1)
-    curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_CYAN)
-    curses.init_pair(4, 8, -1)
+    curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_CYAN)
+    curses.init_pair(4, curses.COLOR_WHITE, -1)
 
 
 def _draw(stdscr, modules, selected):
@@ -17,9 +17,8 @@ def _draw(stdscr, modules, selected):
     _init_colors()
 
     CYAN  = curses.color_pair(1) | curses.A_BOLD
-    WHITE = curses.color_pair(2)
-    SEL   = curses.color_pair(3) | curses.A_BOLD
-    DIM   = curses.color_pair(4)
+    WHITE = curses.color_pair(2) | curses.A_BOLD
+    DIM   = curses.color_pair(2)
 
     stdscr.erase()
     h, w = stdscr.getmaxyx()
@@ -73,10 +72,12 @@ def _draw(stdscr, modules, selected):
         label = mod.LABEL if mod else "Exit"
         desc  = mod.DESC  if mod else "Goodbye!"
         is_sel = (i == selected)
-        lline  = (("  > " if is_sel else "    ") + label).ljust(inner_w)
+        arrow  = " → " if is_sel else "   "
+        lline  = (arrow + label).ljust(inner_w)
+        style  = CYAN if is_sel else WHITE
         try:
             stdscr.addstr(row, box_x,          "| ",  CYAN)
-            stdscr.addstr(row, box_x+2,         lline, SEL if is_sel else WHITE)
+            stdscr.addstr(row, box_x+2,         lline, style)
             stdscr.addstr(row, box_x+2+inner_w, " |",  CYAN)
         except curses.error: pass
         row += 1
@@ -130,8 +131,8 @@ def select(title, options):
         _init_colors()
 
         CYAN  = curses.color_pair(1) | curses.A_BOLD
-        WHITE = curses.color_pair(2)
-        DIM   = curses.color_pair(4)
+        WHITE = curses.color_pair(2) | curses.A_BOLD
+        DIM   = curses.color_pair(2)
 
         stdscr.erase()
         h, w = stdscr.getmaxyx()
