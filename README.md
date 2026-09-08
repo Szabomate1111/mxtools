@@ -9,7 +9,7 @@
 |_|  |_/_/\_\__\___/ \___/|_|___/
 ```
 
-**Everything in one place** — interactive terminal CLI tool.
+**Everything in one place** - interactive terminal CLI tool.
 
 ## Install
 
